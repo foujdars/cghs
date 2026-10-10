@@ -1,0 +1,8 @@
+const assert=require('node:assert/strict');const fs=require('node:fs');const vm=require('node:vm');const C=require('./companion/core.js');
+assert.equal(C.minutes('08:30 AM(Slot 8B-1)'),510);assert.equal(C.minutes('12:00 PM(Slot 12A-1)'),720);assert.equal(C.minutes('01:30 PM(Slot 13B-1)'),810);assert.equal(C.minutes('12:00 AM'),0);assert.equal(C.minutes('25:00'),null);assert.equal(C.minutes('08:90 AM'),null);assert.equal(C.minutes('Save'),null);
+assert.equal(C.isoDate('12-Oct-\n2026'),'2026-10-12');assert.equal(C.isoDate('13-Oct-2026'),'2026-10-13');assert.equal(C.isoDate('13-foo-2026'),null);
+assert(C.green('rgb(0, 128, 0)'));assert(C.green('rgb(25, 135, 84)'));assert(!C.green('rgb(255, 0, 0)'));assert(!C.green('rgb(13, 110, 253)'));assert(!C.green('rgb(255, 255, 255)'));assert(C.red('rgb(255, 0, 0)'));assert(C.red('rgb(255, 61, 71)'));assert(!C.red('rgb(25, 135, 84)'));
+const p={version:1,beneficiaryId:'1234567',city:'Bengaluru',department:'General OPD',centre:'Test centre',doctor:'Test doctor',date:'2026-10-12',start:'08:00',end:'09:30',interval:120,mode:'notify'};assert(C.validPlan(p));for(const patch of [{beneficiaryId:'abc'},{doctor:''},{interval:1},{mode:'unknown'},{start:'10:00'},{watchStart:'invalid'}])assert(!C.validPlan({...p,...patch}));
+for(const f of ['dist/app.js','companion/content.js','companion/popup.js','companion/background.js'])new vm.Script(fs.readFileSync(f,'utf8'));
+for(const f of ['dist/app.js','companion/background.js','companion/content.js'])assert(!/localStorage|storage\.local|storage\.sync|fetch\(/.test(fs.readFileSync(f,'utf8')));
+console.log('Passed: time/date parsing, availability colours, plan validation, JavaScript syntax, and sensitive-persistence checks.');

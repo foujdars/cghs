@@ -1,0 +1,2 @@
+import {authorized,send,allow,cors} from '../lib/security.mjs';import {rpc} from '../lib/database.mjs';
+export default async function handler(req,res){if(!cors(req,res))return;if(!allow(req,res,['POST','GET']))return;if(!authorized(req,process.env.CRON_SECRET))return send(res,401,{error:'unauthorized'});try{const queued=await rpc('slotcare_enqueue_due');return send(res,200,{ok:true,queued});}catch{return send(res,503,{error:'scheduler_not_ready'});}}
